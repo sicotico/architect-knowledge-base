@@ -1,0 +1,46 @@
+site_name: Luis Puente | Architect Knowledge Base
+site_description: Base de conocimiento técnica sobre IA Local, Arquitectura Cloud, Homelab y DevOps.
+site_author: Luis Puente
+site_url: https://sicotico.github.io/architect-knowledge-base/
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Cambiar a modo claro
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Cambiar a modo oscuro
+  features:
+    - navigation.indexes
+    - navigation.instant
+    - navigation.top
+    - code.copy
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - tables
+  - admonition
+
+nav:
+  - Inicio: index.md
+  - 🤖 IA Local:
+      - QAT & Cuantización: ia-local/qat-quantization.md
+  - 🕵️ Agentes: agentes/openclaw.md
+  - ☁️ Azure: azure/openai.md
+  - 📐 Arquitectura: arquitectura/patrones.md
+  - ☸️ Kubernetes: kubernetes/k8s.md
+  - 💰 FinOps: finops/costes.md
+  - 🖥️ Homelab: homelab/hardware.md
+  - 🎤 Conferencias: conferencias/charlas.md

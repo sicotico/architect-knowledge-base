@@ -1,0 +1,294 @@
+# Arquitecturas MoE: A3B y A4B
+
+> Estado: Borrador v1.0
+
+## Objetivo
+
+Comprender qué significan las nomenclaturas **A3B** y **A4B**, por qué están apareciendo en los modelos de IA más recientes y cómo permiten ejecutar modelos grandes en hardware doméstico.
+
+Este documento también recoge la experiencia obtenida durante el laboratorio utilizando **Gemma 4 26B A4B QAT** sobre una **RTX 5060 Ti de 16 GB**.
+
+---
+
+# El problema que intenta resolver
+
+Durante varios años los modelos de lenguaje seguían una idea muy sencilla:
+
+> Para generar cada token se utilizan todos los parámetros del modelo.
+
+Por ejemplo:
+
+| Modelo | Parámetros utilizados por token |
+|---------|-------------------------------:|
+| Llama 3 8B | 8B |
+| Llama 3 70B | 70B |
+
+Este diseño tiene un inconveniente muy importante.
+
+Cuanto mayor es el modelo:
+
+- mayor consumo de VRAM;
+- mayor ancho de banda de memoria;
+- menor velocidad de inferencia;
+- mayor coste energético.
+
+En un laboratorio doméstico esto supone una limitación importante.
+
+Aunque una GPU pueda almacenar un modelo grande, no siempre puede ejecutarlo con suficiente velocidad.
+
+---
+
+# Explicación sencilla
+
+Una buena analogía consiste en imaginar un hospital.
+
+## Modelo tradicional
+
+Cada vez que llega un paciente trabajan simultáneamente:
+
+- el cardiólogo;
+- el traumatólogo;
+- el dermatólogo;
+- el neurólogo;
+- el oncólogo.
+
+Aunque el paciente únicamente tenga un resfriado.
+
+Es un enorme desperdicio de recursos.
+
+---
+
+## Modelo MoE
+
+Ahora imaginemos que existe un recepcionista.
+
+Ese recepcionista decide qué especialistas son necesarios.
+
+Para un resfriado únicamente intervienen:
+
+- medicina general;
+- farmacia.
+
+El resto de especialistas permanecen inactivos.
+
+El hospital sigue teniendo cientos de especialistas disponibles, pero solamente trabajan los necesarios.
+
+Eso es exactamente lo que hace un modelo **Mixture of Experts (MoE)**.
+
+---
+
+# ¿Qué significa A3B y A4B?
+
+Las nomenclaturas **A3B** y **A4B** indican aproximadamente la cantidad de parámetros **activos** durante la inferencia.
+
+No representan el tamaño completo del modelo.
+
+Por ejemplo:
+
+| Modelo | Parámetros totales | Parámetros activos |
+|---------|------------------:|-------------------:|
+| Gemma 4 26B A4B | 26B | ~4B |
+| Modelo A3B | depende del modelo | ~3B |
+
+Por tanto:
+
+- el modelo sigue teniendo toda la capacidad de un modelo grande;
+- pero solamente ejecuta una pequeña parte en cada token.
+
+---
+
+# ¿Cómo funciona?
+
+Un modelo MoE está compuesto por varios elementos.
+
+## Router
+
+Es una pequeña red neuronal.
+
+Su trabajo consiste en decidir:
+
+> ¿Qué expertos son los más adecuados para responder al siguiente token?
+
+---
+
+## Expertos
+
+Cada experto está especializado en distintos patrones.
+
+Por ejemplo:
+
+- programación;
+- razonamiento;
+- matemáticas;
+- lenguaje natural;
+- traducción.
+
+No significa que exista un experto llamado "programación".
+
+Simplemente, durante el entrenamiento algunos expertos terminan especializándose en determinados tipos de información.
+
+---
+
+## Activación
+
+Para cada token:
+
+1. llega el token;
+2. el router calcula qué expertos utilizar;
+3. únicamente esos expertos realizan cálculos;
+4. el resto permanecen inactivos.
+
+Este proceso ocurre miles de veces por segundo.
+
+---
+
+# Ventajas
+
+## Más rendimiento
+
+Al ejecutar muchos menos parámetros activos:
+
+- aumenta la velocidad;
+- disminuye la latencia.
+
+---
+
+## Menor consumo de memoria
+
+Aunque el modelo completo siga ocupando mucha VRAM, el coste computacional por token es mucho menor.
+
+---
+
+## Escalabilidad
+
+Permite construir modelos enormes sin multiplicar linealmente el coste de inferencia.
+
+---
+
+## Mejor relación calidad/rendimiento
+
+Actualmente muchos modelos MoE ofrecen una calidad comparable a modelos densos mucho mayores.
+
+---
+
+# Inconvenientes
+
+No todo son ventajas.
+
+## Mayor complejidad
+
+El modelo necesita un router.
+
+Esto hace que el entrenamiento sea más complejo.
+
+---
+
+## Inferencia más complicada
+
+No todos los motores de inferencia implementan MoE con la misma eficiencia.
+
+---
+
+## Consumo de memoria
+
+Aunque solamente se activen unos pocos expertos, el modelo completo sigue almacenándose en memoria.
+
+Por tanto:
+
+- reduce el coste computacional;
+- pero no elimina la necesidad de disponer de suficiente VRAM.
+
+---
+
+# Relación con otras tecnologías
+
+## QAT
+
+QAT permite cuantizar el modelo manteniendo gran parte de su calidad.
+
+Gracias a ello podemos ejecutar modelos MoE ocupando menos memoria.
+
+---
+
+## GGUF
+
+GGUF es el formato utilizado por llama.cpp para almacenar el modelo cuantizado.
+
+---
+
+## MTP
+
+MTP intenta generar varios tokens simultáneamente.
+
+Es una tecnología complementaria a MoE.
+
+---
+
+## Flash Attention
+
+Reduce el coste de la atención durante la inferencia.
+
+También complementa el uso de modelos MoE.
+
+---
+
+# Cómo lo hemos utilizado en el laboratorio
+
+Durante este laboratorio el objetivo era obtener la mayor inteligencia posible manteniendo toda la inferencia dentro de una GPU doméstica.
+
+Hardware utilizado:
+
+- NVIDIA RTX 5060 Ti
+- 16 GB VRAM
+- Ubuntu Server 26.04 LTS
+- llama-server
+- Backend CUDA
+
+Tras comparar distintos modelos se seleccionó:
+
+**Gemma 4 26B A4B QAT Q4_0**
+
+Los motivos fueron:
+
+- excelente relación calidad/rendimiento;
+- utilización de arquitectura MoE;
+- utilización de QAT;
+- capacidad para trabajar completamente en VRAM;
+- aproximadamente 100 tokens/segundo en generación;
+- contexto estable cercano a 65K tokens.
+
+Durante las pruebas se comprobó que aumentar el contexto hasta 96K era posible, aunque el punto de equilibrio entre capacidad y rendimiento se situó alrededor de los 65K tokens.
+
+---
+
+# Lo que aprendimos
+
+Las conversaciones realizadas durante el laboratorio permitieron extraer varias conclusiones.
+
+- El tamaño total del modelo ya no es el dato más importante.
+- Los parámetros activos son una métrica mucho más útil para estimar el rendimiento.
+- Las arquitecturas MoE están cambiando el equilibrio entre calidad y requisitos hardware.
+- Combinar MoE con QAT permite ejecutar modelos muy capaces en hardware doméstico.
+- Actualmente la IA local vive un momento especialmente interesante gracias a la combinación de tecnologías como MoE, QAT y MTP.
+
+---
+
+# Conclusiones
+
+Las arquitecturas **A3B** y **A4B** no representan un nuevo tipo de modelo independiente, sino una forma de indicar cuántos parámetros permanecen activos durante la inferencia en modelos **Mixture of Experts (MoE)**.
+
+Esta aproximación permite ofrecer la calidad de modelos de gran tamaño reduciendo significativamente el trabajo necesario para generar cada token.
+
+En nuestro laboratorio esta tecnología ha permitido ejecutar **Gemma 4 26B A4B QAT** con un rendimiento cercano a los **100 tokens por segundo**, demostrando que la combinación de MoE, QAT y llama.cpp abre la puerta a ejecutar modelos muy avanzados en hardware de consumo.
+
+---
+
+# Próximos artículos
+
+- ¿Qué es QAT?
+- ¿Qué es MTP?
+- ¿Qué es MoE?
+- Prefill vs Decode
+- GGUF
+- KV Cache
+- Flash Attention

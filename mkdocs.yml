@@ -1,7 +1,7 @@
 site_name: Luis Puente | Architect Knowledge Base
 site_description: Base de conocimiento técnica sobre IA Local, Arquitectura Cloud, Homelab y DevOps.
 site_author: Luis Puente
-site_url: https://sicotico.github.io/architect-knowledge-base/
+site_url: https://docs.luispuente.net/
 
 theme:
   name: material

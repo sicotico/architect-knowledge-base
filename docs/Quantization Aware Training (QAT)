@@ -1,0 +1,484 @@
+# Quantization Aware Training (QAT)
+
+## Concepto
+
+**Quantization Aware Training (QAT)** es una técnica de entrenamiento de modelos de inteligencia artificial que permite que el modelo aprenda teniendo en cuenta desde el principio las pérdidas de precisión que introduce la cuantización.
+
+La idea principal es:
+
+> Entrenar un modelo simulando cómo funcionará después de ser reducido a menor precisión numérica.
+
+En lugar de entrenar un modelo en precisión completa (FP32/BF16) y después convertirlo a INT8, INT4 u otros formatos, QAT introduce durante el entrenamiento los efectos de la cuantización para que el modelo se adapte.
+
+---
+
+# Explicación sencilla
+
+Un modelo de IA utiliza millones o miles de millones de números para representar sus conocimientos.
+
+Normalmente esos valores se almacenan con alta precisión:
+
+```
+FP32
+32 bits por número
+```
+
+o:
+
+```
+BF16
+16 bits por número
+```
+
+Esto proporciona mucha precisión, pero consume mucha memoria.
+
+Ejemplo:
+
+Un modelo con:
+
+```
+70.000 millones de parámetros
+```
+
+en FP16 necesita aproximadamente:
+
+```
+70B × 2 bytes ≈ 140 GB
+```
+
+Esto hace imposible ejecutarlo en hardware doméstico.
+
+La cuantización intenta reducir ese tamaño:
+
+```
+FP16  →  Q8
+FP16  →  Q4
+FP16  →  Q2
+```
+
+Por ejemplo:
+
+```
+FP16:
+16 bits por peso
+
+Q4:
+4 bits por peso
+```
+
+El modelo puede ocupar aproximadamente una cuarta parte de memoria.
+
+El problema es que al reducir precisión aparece un error:
+
+```
+Valor original:
+
+0.732918273
+
+Valor cuantizado:
+
+0.75
+```
+
+El modelo pierde información.
+
+---
+
+# Problema de la cuantización tradicional
+
+El flujo clásico es:
+
+```
+Entrenamiento
+      |
+      v
+Modelo FP16/BF16
+      |
+      v
+Cuantización posterior
+      |
+      v
+Modelo Q4/Q8
+```
+
+El modelo nunca ha visto durante su aprendizaje que sus pesos iban a ser modificados.
+
+Por eso algunos modelos pierden:
+
+- Capacidad de razonamiento.
+- Precisión matemática.
+- Seguimiento de instrucciones.
+- Calidad en conversaciones largas.
+
+---
+
+# Cómo funciona QAT
+
+QAT cambia el proceso:
+
+```
+Entrenamiento
+
+      |
+      v
+
+Simulación de cuantización
+
+      |
+      v
+
+El modelo aprende compensando errores
+
+      |
+      v
+
+Modelo preparado para INT8/INT4
+```
+
+Durante el entrenamiento:
+
+1. Los pesos siguen actualizándose con alta precisión.
+2. Se simula la reducción de bits.
+3. El modelo aprende a minimizar el impacto del error.
+4. Al finalizar, el modelo funciona mejor en formato cuantizado.
+
+---
+
+# Ejemplo sencillo
+
+Imaginemos que una red neuronal aprende que:
+
+```
+Peso ideal:
+
+0.734
+```
+
+Al convertirlo a 4 bits podría quedar:
+
+```
+0.75
+```
+
+La diferencia es:
+
+```
+0.016
+```
+
+En un modelo pequeño puede ser irrelevante.
+
+Pero en un LLM con miles de millones de parámetros, estos pequeños errores se acumulan.
+
+QAT permite que durante el entrenamiento el modelo aprenda:
+
+"Cuando mis pesos sean redondeados, debo ajustar otros valores para mantener el comportamiento".
+
+---
+
+# ¿Para qué sirve QAT?
+
+Principalmente para crear modelos:
+
+- Más pequeños.
+- Más rápidos.
+- Con menor consumo de memoria.
+- Ejecutables en hardware limitado.
+
+Casos habituales:
+
+## Dispositivos Edge
+
+Ejemplos:
+
+- Smartphones.
+- Cámaras inteligentes.
+- Robots.
+- Sistemas industriales.
+
+Donde no existe una GPU potente.
+
+---
+
+## Servidores locales de IA
+
+Permite ejecutar modelos grandes en hardware doméstico.
+
+Ejemplo:
+
+Una GPU con:
+
+```
+RTX 5060 Ti
+16 GB VRAM
+```
+
+puede ejecutar modelos que originalmente necesitarían mucha más memoria si están correctamente cuantizados.
+
+---
+
+# Diferencia entre PTQ y QAT
+
+Existen dos grandes estrategias:
+
+## Post Training Quantization (PTQ)
+
+Cuantización después del entrenamiento.
+
+```
+Modelo FP16
+
+       |
+       v
+
+Cuantización
+
+       |
+       v
+
+Modelo Q4/Q8
+```
+
+Ventajas:
+
+- Más sencillo.
+- Más rápido.
+- No requiere volver a entrenar.
+
+Desventajas:
+
+- Puede perder más calidad.
+
+
+---
+
+## Quantization Aware Training (QAT)
+
+Cuantización durante el entrenamiento.
+
+```
+Entrenamiento
+
+       |
+       v
+
+Simulación de cuantización
+
+       |
+       v
+
+Modelo optimizado para baja precisión
+```
+
+Ventajas:
+
+- Mejor calidad final.
+- Menor pérdida al usar INT8/INT4.
+
+Desventajas:
+
+- Más complejo.
+- Necesita entrenamiento adicional.
+- Requiere más recursos.
+
+---
+
+# Relación con Q4, Q8 y GGUF
+
+QAT no es un formato de modelo.
+
+Es una técnica de entrenamiento.
+
+Después del entrenamiento podemos obtener modelos que se distribuyen en formatos como:
+
+```
+GGUF
+EXL3
+GPTQ
+AWQ
+```
+
+Y con diferentes precisiones:
+
+```
+Q8
+Q6
+Q5
+Q4
+```
+
+Ejemplo:
+
+```
+Gemma-4-26B-A4B
+
+Modelo original:
+BF16
+
+↓
+
+Aplicando cuantización:
+
+Q4_0
+
+↓
+
+Modelo GGUF ejecutable con llama.cpp
+```
+
+---
+
+# Relación con modelos A3B/A4B y MoE
+
+En modelos modernos como:
+
+```
+Gemma 4 A4B
+```
+
+la cuantización es especialmente importante.
+
+Un modelo MoE puede tener muchos parámetros totales, pero solo activar algunos expertos.
+
+Ejemplo:
+
+```
+Modelo:
+26B parámetros
+
+Expertos activos:
+4B parámetros
+```
+
+La combinación:
+
+```
+MoE
++
+QAT
++
+Quantization Q4/Q8
+```
+
+permite ejecutar modelos avanzados en hardware mucho más limitado.
+
+---
+
+# Caso práctico revisado
+
+## Hardware utilizado
+
+Nuestro entorno:
+
+```
+GPU:
+NVIDIA RTX 5060 Ti
+
+VRAM:
+16 GB
+
+Backend:
+llama.cpp / Ollama
+
+Modelo:
+Gemma 4 26B A4B Q4_0
+```
+
+---
+
+## Problema inicial
+
+Un modelo grande en precisión completa:
+
+```
+BF16
+```
+
+superaría ampliamente los:
+
+```
+16 GB VRAM
+```
+
+Por eso necesitamos:
+
+```
+Cuantización
+```
+
+---
+
+## Prueba realizada
+
+Utilizamos:
+
+```
+Gemma 4 26B A4B Q4_0
+```
+
+Configuración:
+
+```
+GPU layers:
+999
+
+Flash Attention:
+ON
+
+KV Cache:
+Q8_0
+
+Contexto:
+65536 tokens
+```
+
+Resultado aproximado:
+
+```
+100 tokens/segundo
+```
+
+La cuantización permitió ejecutar un modelo con arquitectura avanzada en una GPU doméstica.
+
+---
+
+# Ventajas e inconvenientes
+
+| Ventajas | Inconvenientes |
+|---|---|
+| Reduce memoria necesaria | Puede perder calidad |
+| Permite ejecutar modelos grandes localmente | Requiere técnicas específicas |
+| Reduce consumo energético | Algunas tareas sensibles empeoran |
+| Mejora despliegues Edge | Necesita validación del modelo |
+
+---
+
+# Resumen
+
+Quantization Aware Training es una técnica donde el modelo aprende durante su entrenamiento los efectos de la reducción de precisión.
+
+Su objetivo es conseguir modelos:
+
+```
+Más pequeños
++
+Más rápidos
++
+Con menor consumo
++
+Manteniendo la calidad
+```
+
+En nuestro laboratorio de IA local, QAT y cuantización son elementos clave para poder ejecutar modelos como:
+
+```
+Gemma 4 26B A4B Q4_0
+```
+
+en una GPU de:
+
+```
+16 GB VRAM
+```
+
+sin necesidad de offloading a memoria RAM.

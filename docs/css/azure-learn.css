@@ -1,0 +1,274 @@
+/* ============================================
+   Azure Learn Style Theme for MkDocs Material
+   Inspirado en: https://learn.microsoft.com
+   ============================================ */
+
+/* === VARIABLES CSS === */
+:root {
+  /* Colores principales de Azure */
+  --azure-blue: #0078d4;
+  --azure-blue-hover: #106ebe;
+  --azure-light-blue: #deecf9;
+  --azure-dark-blue: #005a9e;
+  
+  /* Colores de fondo y texto */
+  --azure-bg-primary: #ffffff;
+  --azure-bg-secondary: #f5f5f5;
+  --azure-bg-code: #f6f6f6;
+  --azure-text-primary: #333333;
+  --azure-text-secondary: #666666;
+  --azure-border: #e0e0e0;
+  
+  /* Colores de advertencias estilo Microsoft */
+  --azure-info-bg: #f0f8ff;
+  --azure-info-border: #0078d4;
+  --azure-warning-bg: #fff4ce;
+  --azure-warning-border: #fde000;
+  --azure-danger-bg: #fde7e9;
+  --azure-danger-border: #d32f2f;
+  --azure-success-bg: #e8f5e9;
+  --azure-success-border: #4caf50;
+}
+
+/* === COLORES PRINCIPALES AZURE === */
+[data-md-color-primary="blue"] {
+  --md-primary-fg-color: #0078d4;
+  --md-primary-fg-color--light: #106ebe;
+  --md-primary-fg-color--dark: #005a9e;
+}
+
+/* === HEADER ESTILO AZURE LEARN === */
+.md-header {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  border-bottom: 2px solid var(--azure-blue) !important;
+}
+
+.md-header__button.md-logo {
+  margin: 0 8px;
+}
+
+.md-header__title {
+  font-weight: 600;
+  color: var(--azure-text-primary);
+}
+
+/* === NAVEGACIÓN PRINCIPAL (TABS) === */
+.md-tabs {
+  background-color: #f5f5f5 !important;
+  border-bottom: 1px solid var(--azure-border) !important;
+}
+
+.md-tabs__link {
+  font-weight: 500;
+  color: var(--azure-text-secondary) !important;
+  transition: all 0.2s ease;
+}
+
+.md-tabs__link:hover {
+  color: var(--azure-blue) !important;
+  background-color: rgba(0, 120, 212, 0.05);
+}
+
+.md-tabs__link--active {
+  color: var(--azure-blue) !important;
+  border-bottom: 3px solid var(--azure-blue) !important;
+}
+
+/* === SIDEBAR ESTILO AZURE LEARN === */
+.md-nav__link {
+  color: var(--azure-text-primary);
+  font-weight: 400;
+  padding: 4px 0;
+  transition: all 0.2s ease;
+}
+
+.md-nav__link:hover {
+  color: var(--azure-blue);
+  background-color: var(--azure-light-blue);
+}
+
+.md-nav__link--active {
+  color: var(--azure-blue) !important;
+  font-weight: 600;
+  border-left: 3px solid var(--azure-blue);
+  padding-left: 12px;
+}
+
+/* Secciones del sidebar agrupadas */
+.md-nav__item--nested.md-nav__item--collapsible {
+  border-bottom: none;
+}
+
+.md-nav__item--section > .md-nav__link {
+  font-weight: 600;
+  color: var(--azure-text-primary);
+  font-size: 0.9em;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* === LINKS AZULES AZURE === */
+.md-typeset a {
+  color: var(--azure-blue) !important;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.md-typeset a:hover {
+  color: var(--azure-blue-hover) !important;
+  border-bottom-color: currentColor;
+}
+
+/* === CODE BLOCKS ESTILO MICROSOFT === */
+.md-code__content,
+code,
+pre {
+  font-family: Consolas, "Courier New", monospace;
+  background-color: var(--azure-bg-code) !important;
+  border-radius: 4px;
+}
+
+/* Bloques de código con borde sutil */
+.md-code__container {
+  border: 1px solid var(--azure-border);
+  border-radius: 4px;
+}
+
+/* === ADMONITIONS ESTILO MICROSOFT === */
+.admonition,
+.md-admonition {
+  border-left: 4px solid var(--azure-blue) !important;
+  border-radius: 4px;
+  margin: 1em 0;
+}
+
+.admonition-title,
+.md-admonition-title {
+  font-weight: 600;
+  background-color: var(--azure-light-blue);
+}
+
+/* Info */
+.admonition.info,
+.md-typeset .admonition.info,
+.md-typeset .admonition.note {
+  border-left-color: var(--azure-info-border) !important;
+}
+
+/* Warning */
+.admonition.warning,
+.md-typeset .admonition.warning {
+  border-left-color: var(--azure-warning-border) !important;
+}
+
+/* Danger/Error */
+.admonition.danger,
+.admonition.error,
+.md-typeset .admonition.danger,
+.md-typeset .admonition.error {
+  border-left-color: var(--azure-danger-border) !important;
+}
+
+/* Success */
+.admonition.success,
+.admonition.hint,
+.md-typeset .admonition.success,
+.md-typeset .admonition.hint {
+  border-left-color: var(--azure-success-border) !important;
+}
+
+/* === TÍTULOS ESTILO AZURE LEARN === */
+.md-typeset h1 {
+  font-weight: 300;
+  color: var(--azure-text-primary);
+  margin-bottom: 0.5em;
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  color: var(--azure-text-primary);
+  border-bottom: 2px solid var(--azure-light-blue);
+  padding-bottom: 8px;
+}
+
+.md-typeset h3 {
+  font-weight: 600;
+  color: var(--azure-dark-blue);
+}
+
+/* === TABS ESTILO AZURE LEARN === */
+.md-tabs {
+  display: flex;
+  align-items: center;
+}
+
+/* === SCROLLBAR PERSONALIZADO === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--azure-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--azure-blue);
+}
+
+/* === FOOTER MINIMALISTA === */
+.md-footer {
+  background-color: var(--azure-bg-secondary) !important;
+  border-top: 1px solid var(--azure-border) !important;
+}
+
+/* === BOTONES Y ELEMENTOS INTERACTIVOS === */
+.md-button {
+  background-color: var(--azure-blue) !important;
+  color: #ffffff !important;
+  border-radius: 2px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.md-button:hover {
+  background-color: var(--azure-blue-hover) !important;
+}
+
+/* === BÚSQUEDA ESTILIZADA === */
+.md-search__input {
+  background-color: var(--azure-bg-secondary);
+  border-radius: 4px;
+}
+
+.md-search__input::placeholder {
+  color: var(--azure-text-secondary);
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 1200px) {
+  .md-sidebar--primary {
+    width: 16rem;
+  }
+}
+
+/* === ANIMACIONES SUAVES === */
+.md-nav__link,
+.md-tabs__link,
+.md-button,
+.md-typeset a {
+  transition: all 0.2s ease-in-out;
+}
+
+/* === SELECCIÓN DE TEXTO === */
+::selection {
+  background-color: var(--azure-light-blue);
+  color: var(--azure-dark-blue);
+}

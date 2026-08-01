@@ -1,0 +1,38 @@
+# =============================================================================
+# PICONOCIMIENTO - .gitignore
+# Repositorio público: architect-knowledge-base
+# Solo se publican docs/ (artículos públicos) y configuración MkDocs
+# =============================================================================
+
+# ===== PRIVADO - Nunca subir =====
+brain/                    # Segundo cerebro personal
+
+# ===== DESARROLLO - Datos originales y scripts =====
+dev/                      # Scripts Python, datos JSON originales, exportaciones ChatGPT
+
+# ===== GENERADOS - Pueden recrearse =====
+site/                     # Sitio MkDocs generado (mkdocs build)
+*.pyc                     # Archivos compilados Python
+__pycache__/              # Cache Python
+venv/                     # Virtual environment
+.venv/                    # Virtual environment alternativo
+
+# ===== BACKUPS LOCALES =====
+backups/                  # Backups locales tar.gz
+*.tar.gz
+*.md5
+backup-status.json        # Estado del backup local
+
+# ===== MCP / SERVIDORES =====
+mcp_server.log            # Logs del servidor MCP
+mcp_server.pid            # PID del servidor MCP
+
+# ===== EDITOR =====
+.vscode/                  # Configuración VS Code (incluye .vscode/mcp.json)
+.idea/                    # PyCharm
+*.swp                     # Vim swap files
+*~                        # Backup files
+
+# ===== SISTEMA =====
+.DS_Store                 # macOS
+Thumbs.db                 # Windows
